@@ -175,8 +175,10 @@ export default {
 }
 </script>
 <style lang="css" scoped>
-/* @import "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css"; */
-
+@import "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css";
+i{
+  font-family: fontawesome !important;
+}
 .margin{
   margin-left: 0;
 }

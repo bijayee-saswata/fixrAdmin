@@ -15,7 +15,7 @@ export default {
 <style>
 
 @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
-@import "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css"; 
+/* @import "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css";  */
 :root {
   --main-bg-color: #1abc9c;
   --main-txt-color: #fff;

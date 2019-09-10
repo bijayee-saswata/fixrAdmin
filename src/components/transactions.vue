@@ -12,7 +12,7 @@
           <thead>
             <tr>
               <th>TID</th>
-              <th>UID</th>
+              <th>OID</th>
               <th>Tr.Date-Time</th>
               <th>Tr.Status</th>
               <th>Res.Status</th>
@@ -27,7 +27,7 @@
             <div v-if="error.length != 0" class="error">{{error}}</div>
              <tr v-for="tr in filteredList" v-bind:key="tr.id">
               <td>{{tr.tid || '123456'}}</td>
-              <td>{{tr.uid }}</td>
+              <td>{{tr.oid }}</td>
               <td>{{tr.date}}</td>
               <td :class="[ tr.color ? 'green' : 'red' ]">{{tr.trSta}}</td>
               <td>{{tr.resSta}}</td>
@@ -90,7 +90,7 @@ db.collection("transactions")
       this.color = 0;
     let loc ={
       tid: data.paymentDetails.txnId,
-      uid: data.paymentDetails.txnRef,
+      oid: data.paymentDetails.txnRef,
       date: data.transactionDate,
       trSta: data.paymentDetails.status,
       resSta: data.responseStatus,

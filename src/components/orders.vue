@@ -2,7 +2,7 @@
   <main>
     <h2>Order Lists</h2>
 
-    <div class="container">
+    <div class="container-fluid">
       <div class="search">
         <input type="text" v-model="query" placeholder="Type here" />
         <i class="fa fa-search"></i>
@@ -11,27 +11,37 @@
         <table class="table table-striped">
           <thead>
             <tr>
+              <th>OID</th>
               <th>Name</th>
               <th>Phone No.</th>
+              <th>Alt. Phone</th>
+              <th>Service</th>
               <th>Message</th>
+              <th>Address</th>
+              <th>Date-Time</th>
+              <!-- <th>Payment Status</th> -->
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             <div v-if="datas.length === 0" class="loading">Loading...</div>
-            <tr v-for="data in filteredList" v-bind:key="data.id">
+            <tr v-for="data in filteredList" v-bind:key="data.oId">
+              <td>{{data.oid || '1234'}}</td>
               <td>{{data.name}}</td>
-              <td>{{data.phone}}</td>
+              <td>{{data.ph}}</td>
+              <td>{{data.altPh}}</td>
+              <td>{{data.ser}}</td>
+              <td>{{data.msg || "Good"}}</td>
+              <td><address>{{data.loc}}</address></td>
+              <td>{{data.date}}</td>
+
               <td>
-                <article>{{data.msg}}</article>
-              </td>
-              <td>
-                <a style="color: green;" data-toggle="modal" data-target="#acceptModal">
+                <span style="color: green;" data-toggle="modal" data-target="#acceptModal" v-on:click="update(data.oid)">
                   <i class="fa fa-check"></i>
-                </a>
-                <a style="color: red;" data-toggle="modal" data-target="#rejectModal">
+                </span>
+                <span style="color: red;" data-toggle="modal" data-target="#rejectModal" v-on:click="update(data.oid)">
                   <i class="fa fa-times"></i>
-                </a>
+                </span>
               </td>
             </tr>
           </tbody>
@@ -48,13 +58,15 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="acceptModalLabel">Accept Order</h5>
+              <h5 class="modal-title" id="acceptModalLabel"><b>Accept Order</b></h5>
+              <input type="text" v-model="oId" disabled>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div class="modal-body">
-              <form class="form-horizontal">
+              <span v-if="sent">Order Accepted</span>
+              <form class="form-horizontal" v-else>
                 <p v-if="errors.length">
                   <b>Please correct the following error(s):</b>
                   <ul>
@@ -104,7 +116,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-success" @click="accept">Accept</button>
+              <button type="button" class="btn btn-success" @click="accept" v-if="!sent">Accept</button>
             </div>
           </div>
         </div>
@@ -122,19 +134,21 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="rejectModalLabel">Reject Order</h5>
+              <h5 class="modal-title" id="rejectModalLabel"><b>Reject Order</b></h5>
+              <input type="text" v-model="oId" disabled>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div class="modal-body">
-                 <p v-if="errors.length">
+              <span v-if="sent">Order Rejected</span>
+              <form class="form-horizontal" v-else>
+                 <p v-if="rErrors.length">
                   <b>Please correct the following error(s):</b>
                   <ul>
                     <li v-for="error in rErrors" v-bind:key="error">{{ error }}</li>
                   </ul>
                 </p>
-              <form class="form-horizontal">
                 <div class="form-group">
                   <label class="control-label col-sm-2" for="reason">*Reason:</label>
                   <div class="col-sm-10">
@@ -152,7 +166,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-danger" @click="reject">Reject</button>
+              <button type="submit" class="btn btn-danger" @click="reject" v-if="!sent">Reject</button>
             </div>
           </div>
         </div>
@@ -168,7 +182,9 @@ export default {
   data() {
     return {
       datas: [],
+      oId: 1,
       query: "",
+      sent: false,
       errors: [],
       rErrors:[],
       rMsg: null,
@@ -192,17 +208,30 @@ export default {
     //       this.datas.push(data);
     //     });
     //   });
-    db.collection("transactions").onSnapshot(querySnapshot => {
+    db.collection("transactions").where("responseStatus","==","none").onSnapshot(querySnapshot => {
       let changes = querySnapshot.docChanges();
-      let all = changes.forEach(change => {
-        if(change.type == 'added'){
-        console.log(change.doc.data());
-        console.log("added");
+      changes.forEach(data => {
+        if(data.type == 'added'){
+            let locData ={
+           tid:   data.doc.data().paymentDetails.txnId,
+           oid: data.doc.data().paymentDetails.txnRef,
+          date:   data.doc.data().transactionDate,
+          trSta:  data.doc.data().paymentDetails.status,
+          msg:    data.doc.data().notes,
+          resSta: data.doc.data().responseStatus,
+          ser:    data.doc.data().serviceDetails.name,
+          name:   data.doc.data().serviceAddress.name,
+          ph:     data.doc.data().serviceAddress.phone,
+          altPh:  data.doc.data().serviceAddress.altPhone,
+          pin:    data.doc.data().serviceAddress.pincode,
+          loc:    data.doc.data().serviceAddress.locality+" "+data.doc.data().serviceAddress.areaAndStreet+" "+data.doc.data().serviceAddress.landmark,
+
         }
-        if(change.type == 'removed'){
-        //console.log(change.doc.data());
-         this.datas.splice(change.doc.id,1);
-        console.log("Removed");
+          this.datas.push(locData);
+        }
+        if(data.type == 'removed'){
+         this.datas.splice(data.doc.data().paymentDetails.txnRef,1);
+
         }
       })
       }
@@ -210,15 +239,32 @@ export default {
   },
   computed: {
     filteredList: function() {
-      return this.datas.filter(num => {
-        return num.name.match(this.query);
-      });
-    }
-  },
+      return this.datas.filter((user) =>{
+        return user.name.toLowerCase().match(this.query.toLowerCase());
+    })
+  }},
   methods: {
+    update(id){
+      this.oId = id;
+    },
     accept(e) {
       if (this.cName && this.cPhone) {
-        return true;
+        // return true;
+              let del = {
+                delivery:{
+                  status: "Accepted",
+        name: this.cName,
+        phone: this.cPhone,
+        alPhone: this.caPhone
+                }
+      }
+      let ref = db.collection("users").doc("EV6gulUlD7YBOF1tbejogqOvKd33").collection("orders").doc(`${this.oId}`);
+      ref.set(del,{merge: true}).then(() =>{
+        this.sent = true;
+        db.collection("transactions").doc(`${this.oId}`).set({responseStatus: "Accepted"},{merge: true}); 
+      });
+      //console.log(d);
+      this.sent = false;
       }
 
       this.errors = [];
@@ -229,30 +275,47 @@ export default {
       if(!this.cPhone){
         this.errors.push('Number required.');
       }
+
       e.preventDefault();
     },
     reject(e) {
-      if (this.msg) {
-        return true;
+      if (this.rMsg) {
+                let del = {
+                delivery:{
+                  status: "Rejected",
+                  msg: this.rMsg
+                }
+      }
+      let ref = db.collection("users").doc("EV6gulUlD7YBOF1tbejogqOvKd33").collection("orders").doc(`${this.oId}`);
+      ref.set(del,{merge: true}).then(() =>{
+        this.sent = true;
+        db.collection("transactions").doc(`${this.oId}`).set({responseStatus: "Rejected"},{merge: true});
+      });
+
       }
 
       this.rErrors = [];
 
-      if (!this.msg) {
+      if (!this.rMsg) {
         this.rErrors.push('message required.');
       }
+      let delivery = {
+        msg: this.rMsg
+      }
+      this.sent = false;
       e.preventDefault();
     }
   }
-};
+}
 </script>
 
 <style lang="css" scoped>
+/* @import "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css";  */
 table th,
 td {
   text-align: center;
 }
-td a {
+td span {
   padding: 0.5em;
 }
 /* Start search */

@@ -18,11 +18,11 @@
             </tr>
           </thead>
           <tbody>
-            <div v-if="datas.length === 0" class="loading">Loading...</div>
+            <!-- <div v-if="filteredList.length === 0" class="loading">Loading...</div> -->
             <tr v-for="user in filteredList" v-bind:key="user.id">
               <td>{{user.name}}</td>
               <td>{{user.phone}}</td>
-              <td><article>{{user.message}}</article></td>
+              <td><article>{{user.msg}}</article></td>
               <td>
                 <a @click="like()">
                   <i class="fa fa-thumbs-up"></i>
@@ -41,38 +41,26 @@
 </template>
 
 <script>
-import db from "../firebaseinit.js";
+//import db from "../firebaseinit.js";
 export default {
   data() {
     return {
-      datas: [],
       query: '',
       error: ''
     };
   },
  created() {
-    db.collection("feedBacks")
-      .get()
-      .then(querySnapshot => {
-        querySnapshot.forEach(doc => {
-          let data = {
-            id: doc.id,
-            name: doc.data().name,
-            phone: doc.data().phone,
-            msg: doc.data().message
-          };
-          this.datas.push(data);
-        });
-    //    console.log(this.datas);
-      }
-      );
+
   },
   computed:{
-    filteredList: function(){
+    filteredList(){
       
-      return this.datas.filter((num) =>{
-           return (num.name.toLowerCase().match(this.query.toLowerCase()));
-    })}
+      // return this.datas.filter((num) =>{
+      //      return (num.name.toLowerCase().match(this.query.toLowerCase()));
+    //})
+    return this.$store.getters.loadData;
+    }
+    
   },
   methods:{
     dislike(){

@@ -81,7 +81,7 @@
 <script>
 import db from "../firebaseinit";
 import firebase from 'firebase';
-
+import {mapGetters,mapActions} from "vuex" ;
 export default {
   data() {
     return {
@@ -89,7 +89,7 @@ export default {
       email: "example@email.com",
       isLoggedIn: false,
       notification: 0,
-      comments : 0,
+      comments : this.$store.state.comments,
       curUser: false,
       feedbackDatas: []
     };
@@ -103,17 +103,14 @@ export default {
           alert(`You are logged out.`);
           this.$router.push("/admin");
         });
-    }
+    },
+    ...mapActions(['fetchDatas'])
   },
   created() {
     const user = firebase.auth().currentUser;
     this.email = user.email;
-    //feedBacks
-      db.collection("feedBacks").onSnapshot(querySnapshot => {
-      let changes = querySnapshot.docChanges();
-          this.comments = changes.length;
-          this.feedbackDatas = changes;
-       })
+   
+    this.fetchDatas();
   },
   mounted() {
     //menu

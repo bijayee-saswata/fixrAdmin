@@ -1,4 +1,5 @@
 import Vue from "vue";
+import { store } from './store/store.js';
 import App from "./App.vue";
 import VueRouter from "vue-router";
 import routes from "./routes";
@@ -27,7 +28,8 @@ firebase.auth().onAuthStateChanged(() => {
   if (!app) {
     app = new Vue({
       render: h => h(App),
-      router
+      router,
+      store,
     }).$mount("#app");
   }
 });

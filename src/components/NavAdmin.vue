@@ -32,7 +32,6 @@
         </li>
         <li><i class="fa fa-envelope"></i><router-link to="/admin/v/feedbacks"> Feedbacks</router-link>
         </li>
-        <p>Example:</p>
         <li><i class="fa fa-envelope-open-o"></i><router-link to="/admin/v/orders"> Orders <span class="num dang">{{notification}}</span></router-link></li>
         <li><i class="fa fa-wrench"></i><a href="#"> Settings <span class="num prim">6</span></a>
           <ul class="side-nav-dropdown">

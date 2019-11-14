@@ -58,7 +58,7 @@ export default {
       // return this.datas.filter((num) =>{
       //      return (num.name.toLowerCase().match(this.query.toLowerCase()));
     //})
-    return this.$store.getters.loadData;
+    return this.$store.getters.loadFeedData;
     }
     
   },

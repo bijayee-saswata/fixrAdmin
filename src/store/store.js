@@ -10,19 +10,30 @@ import db from "../firebaseinit";
 export const store = new Vuex.Store({
     state: {
         feedBacks: [],
+        users: []
     },
     getters: {
-        loadData: state=> {
+        loadFeedData: state=> {
             return state.feedBacks;
+        },
+        loadUserData: state => {
+          return state.users;
+          // console.log(state.users);
+          
         }
     },
     mutations: {
-        Datas(state, payload) {
+        feedDatas(state, payload) {
             state.feedBacks=payload;
+        },
+        userDatas(state,payload){
+          state.users = payload;
         }
+
     },
     actions: {
-        fetchDatas({ commit }) {
+      //feedback datas
+        fetchFeedDatas({ commit }) {
                 // db.collection("feedBacks").onSnapshot(querySnapshot => {
                 //     let changes = querySnapshot.docChanges();
                 db.collection("feedBacks")
@@ -40,9 +51,37 @@ export const store = new Vuex.Store({
                  
                  // this.$store.state.feedBacks.push(data);
                 });
-                commit("Datas", data);
+                commit("feedDatas", data);
         }
         )
-    }
+    },
+
+  //users data
+  fetchUserDatas({ commit }) {
+    db.collection("users").onSnapshot(querySnapshot => {
+      let changes = querySnapshot.docChanges();
+      let data = [];
+        changes.forEach(change => {
+          if(change.type == 'added'){
+            data.push( {
+            id: change.doc.id,
+            name: change.doc.data().name,
+            phone: change.doc.data().phone,
+            address: change.doc.data().areaAndStreet,
+            locality: change.doc.data().locality,
+            pin: change.doc.data().pincode
+          });
+          
+          }
+          else if(change.type == 'removed'){
+            this.data.splice(change.doc.id,1);
+          }
+          
+        });
+        commit("userDatas", data);
+      }
+      );
+}
+
 }
 });

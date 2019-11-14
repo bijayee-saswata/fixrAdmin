@@ -14,7 +14,7 @@
               <th>UID</th>
               <th>Name</th>
               <th>Email</th>
-              <th>Phone</th>
+              <th>Pne</th>
               <th>Address</th>
               <th>Locality</th>
               <th>PIN</th>
@@ -22,8 +22,8 @@
             </tr>
           </thead>
           <tbody>
-            <div v-if="datas.length === 0" class="loading">Loading...</div>
-            <div v-if="error.length != 0" class="error">{{error}}</div>
+            <!-- <div v-if="datas.length === 0" class="loading">Loading...</div>
+            <div v-if="error.length != 0" class="error">{{error}}</div> -->
              <tr v-for="user in filteredList" v-bind:key="user.id">
               <td>{{user.id}}</td>
               <td>{{user.name}}</td>
@@ -57,36 +57,16 @@ export default {
     };
   },
   created() {
-    db.collection("users").onSnapshot(querySnapshot => {
-      let changes = querySnapshot.docChanges();
-        changes.forEach(change => {
-          if(change.type == 'added'){
-            let data = {
-            id: change.doc.id,
-            name: change.doc.data().name,
-            phone: change.doc.data().phone,
-            address: change.doc.data().areaAndStreet,
-            locality: change.doc.data().locality,
-            pin: change.doc.data().pincode
-          };
-          this.datas.push(data);
-          
-          }
-          else if(change.type == 'removed'){
-            this.datas.splice(change.doc.id,1);
-          }
-          
-        });
-      }
-      );
+    // this.$store.dispatch('fetchUserDatas');
   },
   computed:{
     filteredList: function(){
       
-      return this.datas.filter((user) =>{
-        return user.name.toLowerCase().match(this.query.toLowerCase());
-       //console.log(user.name);
-      } )
+      // return this.datas.filter((user) =>{
+      //   return user.name.toLowerCase().match(this.query.toLowerCase());
+      // } )
+       console.log("user.name");
+      return this.$store.getters.loadUserData;
     }
   },
   methods:{

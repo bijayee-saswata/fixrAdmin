@@ -14,7 +14,7 @@
               <th>UID</th>
               <th>Name</th>
               <th>Email</th>
-              <th>Pne</th>
+              <th>Phone</th>
               <th>Address</th>
               <th>Locality</th>
               <th>PIN</th>
@@ -65,7 +65,7 @@ export default {
       // return this.datas.filter((user) =>{
       //   return user.name.toLowerCase().match(this.query.toLowerCase());
       // } )
-       console.log("user.name");
+       console.log("usname");
       return this.$store.getters.loadUserData;
     }
   },

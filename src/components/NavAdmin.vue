@@ -30,7 +30,7 @@
         </li>
         <li><i class="fa fa-bolt"></i><router-link to="/admin/v/transactions"> Transactions</router-link>
         </li>
-        <li><i class="fa fa-envelope"></i><router-link to="/admin/v/feedbacks"> Feedbacks</router-link>
+        <li><i class="fa fa-envelope"></i><router-link to="/admin/v/feedbacks"> Feedbacks <span class="num dang">{{comments}}</span></router-link>
         </li>
         <li><i class="fa fa-envelope-open-o"></i><router-link to="/admin/v/orders"> Orders <span class="num dang">{{notification}}</span></router-link></li>
         <li><i class="fa fa-wrench"></i><a href="#"> Settings <span class="num prim">6</span></a>
@@ -80,15 +80,14 @@
 <script>
 import db from "../firebaseinit";
 import firebase from 'firebase';
-import {mapGetters,mapActions} from "vuex" ;
 export default {
   data() {
     return {
       name: "Hello",
       email: "example@email.com",
       isLoggedIn: false,
-      notification: 0,
-      comments : this.$store.state.comments,
+      notification: this.$store.getters.loadOrderData.length,
+      comments : this.$store.getters.loadFeedData.length,
       curUser: false,
       feedbackDatas: []
     };
@@ -103,13 +102,15 @@ export default {
           this.$router.push("/admin");
         });
     },
-    ...mapActions(['fetchDatas'])
   },
   created() {
     const user = firebase.auth().currentUser;
     this.email = user.email;
    
-    this.fetchDatas();
+    // this.fetchDatas();
+   
+  },
+  computed:{
   },
   mounted() {
     //menu

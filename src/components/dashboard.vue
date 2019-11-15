@@ -22,8 +22,8 @@
               <div class="box">
                 <i class="fa fa-envelope fa-fw bg-primary"></i>
                 <div class="info">
-                  <h3>1,245</h3> <span>Services</span>
-                  <p>Lorem ipsum dolor sit amet</p>
+                  <h3>{{numServices}}</h3> <span>Services</span>
+                  <!-- <p>Lorem ipsum dolor sit amet</p> -->
                 </div>
               </div>
             </div>
@@ -31,8 +31,8 @@
               <div class="box">
                 <i class="fa fa-file fa-fw danger"></i>
                 <div class="info">
-                  <h3>34</h3> <span>Transactions</span>
-                  <p>Lorem ipsum dolor sit amet</p>
+                  <h3>{{tranLength}}</h3> <span>Transactions</span>
+                  <!-- <p>Lorem ipsum dolor sit amet</p> -->
                 </div>
               </div>
             </div>
@@ -41,7 +41,7 @@
                 <i class="fa fa-users fa-fw success"></i>
                 <div class="info">
                   <h3>{{usersLength}}</h3> <span>Users</span>
-                  <p>Lorem ipsum dolor sit amet</p>
+                  <!-- <p>Lorem ipsum dolor sit amet</p> -->
                 </div>
               </div>
             </div>
@@ -168,32 +168,21 @@
 
 
 <script>
-// import Chart from "chart.js";
 import Chart from 'chart.js';
-import db from '../firebaseinit';
 export default {
   name: "dashboard",
   data() {
     return {
-      usersLength : 0,
+      usersLength : this.$store.getters.loadUserData.length,
       numServices : 0,
+      tranLength: 0,
       error : ''
   }},
   methods: {
     
   },
   created(){
-    //users
-      db.collection("users").onSnapshot(querySnapshot => {
-      let changes = querySnapshot.docChanges();
-          this.usersLength = changes.length;
-       })
 
-    //services
-     db.collection("ServiceTypes").onSnapshot(services =>{
-     let changes = services.docChanges();
-      this.numServices = changes.length;
-    })
   },
   mounted() {
     // Start chart

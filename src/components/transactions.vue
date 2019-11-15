@@ -25,7 +25,7 @@
           <tbody>
             <div v-if="datas.length === 0" class="loading">Loading...</div>
             <div v-if="error.length != 0" class="error">{{error}}</div>
-             <tr v-for="tr in filteredList" v-bind:key="tr.id">
+             <tr v-for="tr in loadTranData" v-bind:key="tr.id">
               <td>{{tr.tid || '123456'}}</td>
               <td>{{tr.oid }}</td>
               <td>{{tr.date}}</td>
@@ -44,8 +44,8 @@
 </template>
 
 <script>
-import db from "../firebaseinit";
-
+// import db from "../firebaseinit";
+import {mapGetters} from 'vuex';
 export default {
   data() {
     return {
@@ -77,52 +77,20 @@ export default {
           
         // });
 
-db.collection("transactions")
-.get()
-.then(querySnapshot => {
-  const allDatas = querySnapshot.docs.map(doc => doc.data());
-  allDatas.forEach(data=>{
-    if(data.paymentDetails.status === "SUCCESS"){
 
-      this.color = 1;
-    }
-    else
-      this.color = 0;
-    let loc ={
-      tid: data.paymentDetails.txnId,
-      oid: data.paymentDetails.txnRef,
-      date: data.transactionDate,
-      trSta: data.paymentDetails.status,
-      resSta: data.responseStatus,
-      ser: data.serviceDetails.name,
-      name:data.serviceAddress.name,
-      ph:data.serviceAddress.phone,
-      pin: data.serviceAddress.pincode,
-      color: this.color
-    }
-      this.datas.push(loc);
-  })
-}
-);
 // console.log(this.datas);
 
   },
   computed:{
-    filteredList: function(){
+    // filteredList: function(){
       
-      return this.datas.filter((user) =>{
-        return user.name.toLowerCase().match(this.query.toLowerCase());
-       //console.log(user.name);
-      } )
-    }
-  },
-  methods:{
-   removeUser(key){
-      if (confirm("Are you sure to delete this user!!!")) {
-        db.collection("users").doc(key).delete();
-    }
-  } 
-    }
+    //   return this.datas.filter((user) =>{
+    //     return user.name.toLowerCase().match(this.query.toLowerCase());
+    //    //console.log(user.name);
+    //   } )
+    // }
+    ...mapGetters(['loadTranData'])
+  }
 }
 </script>
 

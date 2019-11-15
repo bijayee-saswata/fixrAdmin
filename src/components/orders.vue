@@ -24,8 +24,8 @@
             </tr>
           </thead>
           <tbody>
-            <div v-if="datas.length === 0" class="loading">Loading...</div>
-            <tr v-for="data in filteredList" v-bind:key="data.oId">
+            <!-- <div v-if="datas.length === 0" class="loading">Loading...</div> -->
+            <tr v-for="data in loadOrderData" v-bind:key="data.oId">
               <td>{{data.oid || '1234'}}</td>
               <td>{{data.name}}</td>
               <td>{{data.ph}}</td>
@@ -177,7 +177,7 @@
 
 <script>
 import db from "../firebaseinit.js";
-
+import {mapGetters} from 'vuex';
 export default {
   data() {
     return {
@@ -208,41 +208,16 @@ export default {
     //       this.datas.push(data);
     //     });
     //   });
-    db.collection("transactions").where("responseStatus","==","none").onSnapshot(querySnapshot => {
-      let changes = querySnapshot.docChanges();
-      changes.forEach(data => {
-        if(data.type == 'added'){
-            let locData ={
-           tid:   data.doc.data().paymentDetails.txnId,
-           oid: data.doc.data().paymentDetails.txnRef,
-          date:   data.doc.data().transactionDate,
-          trSta:  data.doc.data().paymentDetails.status,
-          msg:    data.doc.data().notes,
-          resSta: data.doc.data().responseStatus,
-          ser:    data.doc.data().serviceDetails.name,
-          name:   data.doc.data().serviceAddress.name,
-          ph:     data.doc.data().serviceAddress.phone,
-          altPh:  data.doc.data().serviceAddress.altPhone,
-          pin:    data.doc.data().serviceAddress.pincode,
-          loc:    data.doc.data().serviceAddress.locality+" "+data.doc.data().serviceAddress.areaAndStreet+" "+data.doc.data().serviceAddress.landmark,
 
-        }
-          this.datas.push(locData);
-        }
-        if(data.type == 'removed'){
-         this.datas.splice(data.doc.data().paymentDetails.txnRef,1);
-
-        }
-      })
-      }
-    )
   },
   computed: {
-    filteredList: function() {
-      return this.datas.filter((user) =>{
-        return user.name.toLowerCase().match(this.query.toLowerCase());
-    })
-  }},
+  //   filteredList: function() {
+  //     return this.datas.filter((user) =>{
+  //       return user.name.toLowerCase().match(this.query.toLowerCase());
+  //   })
+  // }
+  ...mapGetters(['loadOrderData']),
+  },
   methods: {
     update(id){
       this.oId = id;
@@ -258,7 +233,7 @@ export default {
         alPhone: this.caPhone
                 }
       }
-      let ref = db.collection("users").doc("EV6gulUlD7YBOF1tbejogqOvKd33").collection("orders").doc(`${this.oId}`);
+      let ref = db.collection("users").doc("4iIx8WsrXmblEIxykLHvrPWHvgn2").collection("orders").doc(`${this.oId}`);
       ref.set(del,{merge: true}).then(() =>{
         this.sent = true;
         db.collection("transactions").doc(`${this.oId}`).set({responseStatus: "Accepted"},{merge: true}); 

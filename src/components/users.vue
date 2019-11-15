@@ -15,7 +15,7 @@
               <th>Name</th>
               <th>Email</th>
               <th>Phone</th>
-              <th>Address</th>
+              <th>Adds</th>
               <th>Locality</th>
               <th>PIN</th>
               <th>Action</th>
@@ -24,7 +24,7 @@
           <tbody>
             <!-- <div v-if="datas.length === 0" class="loading">Loading...</div>
             <div v-if="error.length != 0" class="error">{{error}}</div> -->
-             <tr v-for="user in filteredList" v-bind:key="user.id">
+             <tr v-for="user in loadUserData" v-bind:key="user.id">
               <td>{{user.id}}</td>
               <td>{{user.name}}</td>
               <td>{{user.email || "no@email.com"}}</td>
@@ -46,8 +46,8 @@
 </template>
 
 <script>
-import db from "../firebaseinit";
 
+import {mapGetters} from 'vuex';
 export default {
   data() {
     return {
@@ -57,24 +57,16 @@ export default {
     };
   },
   created() {
-    // this.$store.dispatch('fetchUserDatas');
+    
   },
   computed:{
-    filteredList: function(){
-      
-      // return this.datas.filter((user) =>{
-      //   return user.name.toLowerCase().match(this.query.toLowerCase());
-      // } )
-       console.log("usname");
-      return this.$store.getters.loadUserData;
-    }
+    ...mapGetters(['loadUserData']),
+     
   },
   methods:{
    removeUser(key){
-      if (confirm("Are you sure to delete this user!!!")) {
-        db.collection("users").doc(key).delete();
-    }
-  } 
+    this.$store.dispatch('removeUser',key);
+  }
     }
 }
 </script>

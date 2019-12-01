@@ -8,12 +8,14 @@
 
 export default {
   name: "app",
-  mounted(){
-     this.$store.dispatch('fetchUserDatas');
-    this.$store.dispatch('fetchFeedDatas');
-    this.$store.dispatch('fetchOrderDatas');
-    this.$store.dispatch('fetchTranDatas');
-  }
+  // created(){
+  //     this.$store.dispatch('fetchUserDatas');
+  //     this.$store.dispatch('fetchFeedDatas');
+  //     this.$store.dispatch('fetchOrderDatas');
+  //     this.$store.dispatch('fetchTranDatas');
+  //     this.$store.dispatch('fetchServDatas');
+  // },
+ 
 };
 </script>
 

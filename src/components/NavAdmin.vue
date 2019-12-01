@@ -78,7 +78,7 @@
 </template>
 
 <script>
-import db from "../firebaseinit";
+
 import firebase from 'firebase';
 export default {
   data() {
@@ -86,13 +86,14 @@ export default {
       name: "Hello",
       email: "example@email.com",
       isLoggedIn: false,
-      notification: this.$store.getters.loadOrderData.length,
-      comments : this.$store.getters.loadFeedData.length,
+      notification: 0,
+      comments : 0,
       curUser: false,
       feedbackDatas: []
     };
   },
   methods: {
+
     logout() {
       firebase
         .auth()
@@ -106,13 +107,11 @@ export default {
   created() {
     const user = firebase.auth().currentUser;
     this.email = user.email;
-   
-    // this.fetchDatas();
-   
-  },
-  computed:{
+
+ 
   },
   mounted() {
+
     //menu
     /* eslint-disable */
      var aside = $('.side-nav'),

@@ -1,7 +1,6 @@
 <template>
   <main>
     <h2>Order Lists</h2>
-
     <div class="container-fluid">
       <div class="search">
         <input type="text" v-model="query" placeholder="Type here" />
@@ -16,7 +15,7 @@
               <th>Phone No.</th>
               <th>Alt. Phone</th>
               <th>Service</th>
-              <th>Message</th>
+              <th>Price</th>
               <th>Address</th>
               <th>Date-Time</th>
               <!-- <th>Payment Status</th> -->
@@ -24,22 +23,21 @@
             </tr>
           </thead>
           <tbody>
-            <!-- <div v-if="datas.length === 0" class="loading">Loading...</div> -->
-            <tr v-for="data in loadOrderData" v-bind:key="data.oId">
-              <td>{{data.oid || '1234'}}</td>
-              <td>{{data.name}}</td>
-              <td>{{data.ph}}</td>
-              <td>{{data.altPh}}</td>
-              <td>{{data.ser}}</td>
-              <td>{{data.msg || "Good"}}</td>
-              <td><address>{{data.loc}}</address></td>
-              <td>{{data.date}}</td>
+            <tr v-for="data in filteredList" v-bind:key="data.txnRef">
+              <td>{{data.paymentDetails.txnRef || '1234'}}</td>
+              <td>{{data.serviceAddress.name}}</td>
+              <td>{{data.serviceAddress.phone}}</td>
+              <td>{{data.serviceAddress.altPhone}}</td>
+              <td>{{data.serviceDetails.name}}</td>
+              <td>{{data.serviceDetails.price || "noprice"}}</td>
+              <td><address>{{data.serviceAddress.locality}}</address></td>
+              <td>{{data.serviceDateandTime}}</td>
 
               <td>
-                <span style="color: green;" data-toggle="modal" data-target="#acceptModal" v-on:click="update(data.oid)">
+                <span style="color: green;" data-toggle="modal" data-target="#acceptModal" v-on:click="update(data.paymentDetails.txnRef)">
                   <i class="fa fa-check"></i>
                 </span>
-                <span style="color: red;" data-toggle="modal" data-target="#rejectModal" v-on:click="update(data.oid)">
+                <span style="color: red;" data-toggle="modal" data-target="#rejectModal" v-on:click="update(data.paymentDetails.txnRef)">
                   <i class="fa fa-times"></i>
                 </span>
               </td>
@@ -172,12 +170,13 @@
         </div>
       </div>
     </div>
+    <!-- <pre>{{orders}}</pre> -->
   </main>
 </template>
 
 <script>
 import db from "../firebaseinit.js";
-import {mapGetters} from 'vuex';
+import {mapState, mapActions} from 'vuex';
 export default {
   data() {
     return {
@@ -190,56 +189,55 @@ export default {
       rMsg: null,
       cName: null,
       cPhone: null,
-      caPhone: null,
-      notification : 5
+      caPhone: null
     };
   },
-  created() {
-    // db.collection("feedBacks")
-    //   .get()
-    //   .then(querySnapshot => {
-    //     querySnapshot.forEach(doc => {
-    //       let data = {
-    //         id: doc.id,
-    //         name: doc.data().name,
-    //         phone: doc.data().phone,
-    //         msg: doc.data().message
-    //       };
-    //       this.datas.push(data);
-    //     });
-    //   });
+  mounted() {
 
+    this.init();
   },
-  computed: {
-  //   filteredList: function() {
-  //     return this.datas.filter((user) =>{
-  //       return user.name.toLowerCase().match(this.query.toLowerCase());
-  //   })
-  // }
-  ...mapGetters(['loadOrderData']),
-  },
-  methods: {
+   computed: {
+     ...mapState('orders',['orders']),
+    filteredList(){
+      return this.orders.filter((obj) =>{
+           return (obj.serviceAddress.name.toLowerCase().match(this.query.toLowerCase()));
+    })
+    }
+   },
+  methods:{ 
+    ...mapActions('orders',['init']),
     update(id){
+      this.cName = '';
+      this.cPhone = '';
+      this.caPhone = '';
+      this.rMsg = '';
+      this.sent = false;
       this.oId = id;
     },
     accept(e) {
-      if (this.cName && this.cPhone) {
+      if (this.cName && this.cPhone && this.oId) {
         // return true;
               let del = {
                 delivery:{
-                  status: "Accepted",
         name: this.cName,
         phone: this.cPhone,
         alPhone: this.caPhone
                 }
       }
-      let ref = db.collection("users").doc("4iIx8WsrXmblEIxykLHvrPWHvgn2").collection("orders").doc(`${this.oId}`);
+      let ref = db.collection("transactions").doc(this.oId);
       ref.set(del,{merge: true}).then(() =>{
-        this.sent = true;
-        db.collection("transactions").doc(`${this.oId}`).set({responseStatus: "Accepted"},{merge: true}); 
+        db.collection("transactions").doc(this.oId)
+        .set({responseStatus: "Accepted"},{merge: true}).then(()=>{
+
+          this.sent = true;
+        }).catch(err =>{
+          this.errors.push('Error occured.'+ err);
+        }); 
+      }).catch(err => {
+        this.errors.push('Something went wrong.' + err);
       });
       //console.log(d);
-      this.sent = false;
+     
       }
 
       this.errors = [];
@@ -250,23 +248,30 @@ export default {
       if(!this.cPhone){
         this.errors.push('Number required.');
       }
-
+      if (!this.oId) {
+        this.rErrors.push('order id not found.');
+      }
       e.preventDefault();
     },
     reject(e) {
-      if (this.rMsg) {
+      if (this.rMsg && this.oId) {
                 let del = {
                 delivery:{
-                  status: "Rejected",
                   msg: this.rMsg
                 }
       }
-      let ref = db.collection("users").doc("EV6gulUlD7YBOF1tbejogqOvKd33").collection("orders").doc(`${this.oId}`);
+      let ref = db.collection("transactions").doc(this.oId);
       ref.set(del,{merge: true}).then(() =>{
-        this.sent = true;
-        db.collection("transactions").doc(`${this.oId}`).set({responseStatus: "Rejected"},{merge: true});
+        db.collection("transactions").doc(this.oId)
+        .set({responseStatus: "Rejected"},{merge: true}).then(()=>{
+          this.sent = true;
+        })
+        .catch(err =>{
+          this.errors.push('Error occured.' + err);
+        }); 
+      }).catch(err => {
+        this.errors.push('Something went wrong. ' + err);
       });
-
       }
 
       this.rErrors = [];
@@ -274,18 +279,16 @@ export default {
       if (!this.rMsg) {
         this.rErrors.push('message required.');
       }
-      let delivery = {
-        msg: this.rMsg
+      if (!this.oId) {
+        this.rErrors.push('order id not found.');
       }
-      this.sent = false;
       e.preventDefault();
     }
   }
-}
+  }
 </script>
 
 <style lang="css" scoped>
-/* @import "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css";  */
 table th,
 td {
   text-align: center;

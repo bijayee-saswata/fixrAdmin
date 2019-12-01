@@ -16,36 +16,37 @@
               <th>Tr.Date-Time</th>
               <th>Tr.Status</th>
               <th>Res.Status</th>
-              <th>Serice</th>
+              <th>Service Date</th>
               <th>Name</th>
               <th>Phone</th>
               <th>PIN</th>
             </tr>
           </thead>
           <tbody>
-            <div v-if="datas.length === 0" class="loading">Loading...</div>
-            <div v-if="error.length != 0" class="error">{{error}}</div>
-             <tr v-for="tr in loadTranData" v-bind:key="tr.id">
-              <td>{{tr.tid || '123456'}}</td>
-              <td>{{tr.oid }}</td>
-              <td>{{tr.date}}</td>
-              <td :class="[ tr.color ? 'green' : 'red' ]">{{tr.trSta}}</td>
-              <td>{{tr.resSta}}</td>
-              <td>{{tr.ser}}</td>
-              <td>{{tr.name}}</td>
-              <td>{{tr.ph}}</td>
-              <td>{{tr.pin}}</td>
+            
+            <!-- <div v-if="error.length != 0" class="error">{{error}}</div> -->
+             <tr v-for="tr in filteredList" v-bind:key="tr.id">
+              <td>{{tr.paymentDetails.txnId || '123456'}}</td>
+              <td>{{tr.paymentDetails.txnRef || '12345'}}</td>
+              <td>{{tr.transactionDate || 'no date'}}</td>
+              <td :class="[ tr.color ? 'green' : 'red' ]">{{tr.paymentDetails.status || 'noStatus'}}</td>
+              <td>{{tr.responseStatus || 'noRes'}}</td>
+              <td>{{tr.serviceDateandTime||'nodate'}}</td>
+              <td>{{tr.serviceAddress.name || 'noname'}}</td>
+              <td>{{tr.serviceAddress.phone || '1234567890'}}</td>
+              <td>{{tr.serviceAddress.pincode||'123456'}}</td>
             </tr>
           </tbody>
         </table>  
       </div>
     </div>
+    <!-- <pre>{{transactions}}</pre> -->
   </main>
 </template>
 
 <script>
 // import db from "../firebaseinit";
-import {mapGetters} from 'vuex';
+import {mapState,mapActions} from 'vuex';
 export default {
   data() {
     return {
@@ -55,42 +56,28 @@ export default {
       error: ''
     };
   },
+  mounted(){
+    this.init();
+  },
   created() {
-    // db.collection("transactions").onSnapshot(querySnapshot => {
-    //   let changes = querySnapshot.docChanges();
-        // changes.forEach(change => {
-        //   if(change.type == 'added'){
-        //     let data = {
-        //     id: change.doc.id,
-        //     name: change.doc.data().name,
-        //     phone: change.doc.data().phone,
-        //     address: change.doc.data().areaAndStreet,
-        //     locality: change.doc.data().locality,
-        //     pin: change.doc.data().pincode
-        //   };
-        //   this.datas.push(data);
-          
-        //   }
-        //   else if(change.type == 'removed'){
-        //     this.datas.splice(change.doc.id,1);
-        //   }
-          
-        // });
 
-
-// console.log(this.datas);
 
   },
-  computed:{
-    // filteredList: function(){
+  computed: {
+    ...mapState('trans',['transactions']),
+       filteredList(){
       
-    //   return this.datas.filter((user) =>{
-    //     return user.name.toLowerCase().match(this.query.toLowerCase());
-    //    //console.log(user.name);
-    //   } )
-    // }
-    ...mapGetters(['loadTranData'])
-  }
+      return this.transactions.filter((tr) =>{
+        return tr.serviceAddress.name.toLowerCase().match(this.query.toLowerCase());
+       //console.log(user.name);
+      } )
+    }
+    },
+    // ...mapGetters(['loadUserData']),
+  methods: mapActions('trans',['init']),
+ 
+
+  
 }
 </script>
 
@@ -133,5 +120,10 @@ td {
   display: block;
   color: #2b2f3a;
   font-size: 19px;
+}
+@media (min-width: 1200px){
+  .container {
+    width: 100%;
+}
 }
 </style>

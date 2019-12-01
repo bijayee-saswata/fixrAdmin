@@ -6,7 +6,7 @@
       <div class="search">
         <input type="text" v-model="query" placeholder="Type here" />
         <i class="fa fa-search"></i>
-      </div>
+        </div>
       <div class="table-responsive">
         <table class="table table-striped">
           <thead>
@@ -22,16 +22,14 @@
             </tr>
           </thead>
           <tbody>
-            <!-- <div v-if="datas.length === 0" class="loading">Loading...</div>
-            <div v-if="error.length != 0" class="error">{{error}}</div> -->
-             <tr v-for="user in loadUserData" v-bind:key="user.id">
-              <td>{{user.id}}</td>
-              <td>{{user.name}}</td>
+             <tr v-for="user in filteredList" v-bind:key="user.id">
+              <td>{{user.id || 1234}}</td>
+              <td>{{user.name || "unknown"}}</td>
               <td>{{user.email || "no@email.com"}}</td>
-              <td>{{user.phone}}</td>
-              <td><address>{{user.address}}</address></td>
-              <td>{{user.locality}}</td>
-              <td>{{user.pin}}</td>
+              <td>{{user.phone || 1234567890}}</td>
+              <td><address>{{user.areaAndStreet || 'no address'}}</address></td>
+              <td>{{user.locality || 'no locality'}}</td>
+              <td>{{user.pincode || 100001}}</td>
               <td>
                 <a @click="removeUser(user.id)">
                   <i class="fa fa-trash"></i>
@@ -42,12 +40,12 @@
         </table>  
       </div>
     </div>
+    <!-- <pre>{{users}}</pre> -->
   </main>
 </template>
 
 <script>
-
-import {mapGetters} from 'vuex';
+import {mapState,mapActions} from 'vuex';
 export default {
   data() {
     return {
@@ -56,18 +54,20 @@ export default {
       error: ''
     };
   },
-  created() {
-    
+  mounted() {
+         this.init();
   },
   computed:{
-    ...mapGetters(['loadUserData']),
-     
-  },
-  methods:{
-   removeUser(key){
-    this.$store.dispatch('removeUser',key);
-  }
-    }
+     ...mapState('users',['users']),
+     filteredList(){
+       return this.users.filter((obj) =>{
+           return (obj.name.toLowerCase().match(this.query.toLowerCase()));
+    })
+     }
+     },
+  methods: {
+    ...mapActions('users',['init']),
+}
 }
 </script>
 
@@ -76,6 +76,9 @@ export default {
 table th,
 td {
   text-align: center;
+}
+td span {
+  padding: 0.5em;
 }
 /* Start search */
 .search {
@@ -102,5 +105,10 @@ td {
   display: block;
   color: #2b2f3a;
   font-size: 19px;
+}
+@media (min-width: 1200px){
+  .container {
+    width: 100%;
+}
 }
 </style>

@@ -140,14 +140,14 @@
               <div class="col-md-3">
                 <div class="box warning">
                   <i class="fa fa-shopping-cart"></i>
-                  <h3>5,154</h3>
+                  <h3>5,1</h3>
                   <p class="lead">Product sales</p>
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="box success">
                   <i class="fa fa-handshake-o"></i>
-                  <h3>5,154</h3>
+                  <h3>5,15</h3>
                   <p class="lead">Transactions</p>
                 </div>
               </div>
@@ -169,22 +169,21 @@
 
 <script>
 import Chart from 'chart.js';
+import {mapState} from 'vuex';
 export default {
   name: "dashboard",
   data() {
     return {
-      usersLength : this.$store.getters.loadUserData.length,
+      usersLength : 0,
       numServices : 0,
       tranLength: 0,
       error : ''
-  }},
-  methods: {
-    
+  }
   },
-  created(){
 
-  },
+  computed: mapState('users',['users']),
   mounted() {
+      //console.log(users);
     // Start chart
 
   var chart = document.getElementById('myChart');
@@ -284,7 +283,8 @@ export default {
     }
   });
 
-  }
+  },
+
 }
 </script>
 

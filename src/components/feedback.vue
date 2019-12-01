@@ -18,11 +18,10 @@
             </tr>
           </thead>
           <tbody>
-            <!-- <div v-if="filteredList.length === 0" class="loading">Loading...</div> -->
-            <tr v-for="user in filteredList" v-bind:key="user.id">
+            <tr v-for="user in feedbacks" v-bind:key="user.id">
               <td>{{user.name}}</td>
               <td>{{user.phone}}</td>
-              <td><article>{{user.msg}}</article></td>
+              <td><article>{{user.message}}</article></td>
               <td>
                 <a @click="like()">
                   <i class="fa fa-thumbs-up"></i>
@@ -33,15 +32,17 @@
               </td>
             </tr>
           </tbody>
-        </table>    
+        </table>  
       </div>
       
+        <!-- <pre>{{feedbacks}}</pre>   -->
     </div>
   </main>
 </template>
 
 <script>
 //import db from "../firebaseinit.js";
+import {mapState, mapActions} from 'vuex';
 export default {
   data() {
     return {
@@ -49,36 +50,41 @@ export default {
       error: ''
     };
   },
- created() {
-       
+ mounted() {
+      this.init(); 
 
   },
-  computed:{
-    filteredList(){
-      
-      // return this.datas.filter((num) =>{
-      //      return (num.name.toLowerCase().match(this.query.toLowerCase()));
-    //})
-    return this.$store.getters.loadFeedData;
-    }
-    
-  },
-  methods:{
+computed: mapState('feeds',['feedbacks']),
+    // ...mapGetters(['loadUserData']),
+  methods: {
+    ...mapActions('feeds',['init']),
     dislike(){
       alert('Removed User...');
     },
     like(){
       alert('Love User...');
     }
-  }
+    },
+      
+      // return this.datas.filter((num) =>{
+      //      return (num.name.toLowerCase().match(this.query.toLowerCase()));
+    //})
+
+  // methods:{
+  //   dislike(){
+  //     alert('Removed User...');
+  //   },
+  //   like(){
+  //     alert('Love User...');
+  //   }
+  // }
 };
 </script>
 
 <style lang="css" scoped>
 
-table th,
 td {
-  text-align: center;
+  text-align: left;
 }
 td a{
     padding: 0.5em;
@@ -107,5 +113,10 @@ td a{
   display: block;
   color: #2b2f3a;
   font-size: 19px;
+}
+@media (min-width: 1200px){
+  .container {
+    width: 80%;
+}
 }
 </style>

@@ -6,7 +6,7 @@ import users from './users';
 import trans from './trans';
 import feeds from './feeds';
 import orders from './order';
-
+import calls from './calls';
 Vue.use(Vuex);
 //database 
 import db from "../firebaseinit";
@@ -18,7 +18,8 @@ export const store = new Vuex.Store({
     users,
     trans,
     feeds,
-    orders
+    orders,
+    calls
   },
   /*  state: {
        

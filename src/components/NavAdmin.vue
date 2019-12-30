@@ -30,6 +30,8 @@
         </li>
         <li><i class="fa fa-bolt"></i><router-link to="/admin/v/transactions"> Transactions</router-link>
         </li>
+        <li><i class="fa fa-phone"></i><router-link to="/admin/v/callbacks"> Callbacks</router-link></li>
+
         <li><i class="fa fa-envelope"></i><router-link to="/admin/v/feedbacks"> Feedbacks <span class="num dang">{{comments}}</span></router-link>
         </li>
         <li><i class="fa fa-envelope-open-o"></i><router-link to="/admin/v/orders"> Orders <span class="num dang">{{notification}}</span></router-link></li>

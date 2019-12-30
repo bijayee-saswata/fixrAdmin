@@ -7,7 +7,7 @@ const PageNotFound = () => import("./components/fallBack");
 const transactions = () => import("./components/transactions");
 const feedbacks = () => import("./components/feedback");
 const NavAdmin =() => import ("./components/NavAdmin");
-
+const callbacks = () => import("./components/callBack");
 
 export default [
   {
@@ -42,6 +42,10 @@ export default [
       {
         path: "feedbacks",
         component: feedbacks
+      },
+      {
+        path: "callbacks",
+        component: callbacks
       },
     ]
   },

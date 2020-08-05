@@ -174,7 +174,6 @@ import {mapState, mapActions} from 'vuex';
 export default {
   data() {
     return {
-      datas: [],
       oId: 1,
       query: "",
       sent: false,
@@ -183,7 +182,8 @@ export default {
       rMsg: null,
       cName: null,
       cPhone: null,
-      caPhone: null
+      caPhone: null,
+      msg: ""
     };
   },
   mounted() {
@@ -231,10 +231,27 @@ export default {
       }
       let ref = db.collection("callBack").doc(this.oId);
       ref.set(del,{merge: true}).then(() =>{
-        db.collection("callBack").doc(this.oId)
-        .set({responseStatus: "Accepted"},{merge: true}).then(()=>{
+        //sms
+            this.calls.find(obj => {
+              
+              if(obj.id == this.oId){
+                this.msg = `New order for ${obj.service}. Customer Details: ${obj.name}, ${obj.phone}, ${obj.address}, ${obj.dateTime}.`
+                this.msg = encodeURIComponent(this.msg.trim());
+                //console.log(this.cPhone + this.msg);
+          }
+          })
+        ref.set({responseStatus: "Accepted"},{merge: true}).then(()=>{
 
+            /* eslint-disable  */
+            
+            $.ajax({
+                  method: 'GET',
+                dataType: 'jsonp',
+                url: `https://getwaysms.com/vendorsms/pushsms.aspx?user=bulk1234&password=bulk1234&msisdn=${this.cPhone}&sid=SIGNUP&msg=${this.msg}&fl=0&gwid=2`,
+                success: 'Success'
+              })
           this.sent = true;
+            
         }).catch(err =>{
           this.errors.push('Error occured.'+ err);
         }); 
@@ -255,8 +272,23 @@ export default {
       }
       let ref = db.collection("callBack").doc(this.oId);
       ref.set(del,{merge: true}).then(() =>{
-        db.collection("callBack").doc(this.oId)
-        .set({responseStatus: "Rejected"},{merge: true}).then(()=>{
+         //sms
+        let rPhone =null;
+            this.calls.find(obj => {
+              
+              if(obj.id == this.oId){
+                rPhone = obj.phone;
+              }
+              })
+        ref.set({responseStatus: "Rejected"},{merge: true}).then(()=>{
+           this.rMsg = encodeURIComponent(this.rMsg.trim());
+           /* eslint-disable  */
+          $.ajax({
+                  method: 'GET',
+                dataType: 'jsonp',
+                url: `https://getwaysms.com/vendorsms/pushsms.aspx?user=bulk1234&password=bulk1234&msisdn=${rPhone}&sid=SIGNUP&msg=${this.rMsg}&fl=0&gwid=2`,
+                success: 'Success'
+              })
           this.sent = true;
         })
         .catch(err =>{

@@ -2,98 +2,100 @@
   <main>
     <h2>Transaction Lists</h2>
 
-    <div class="container">
+    <div class="container" v-if="!loading">
       <div class="search">
-        <input type="text" v-model="query" placeholder="Type here" />
-        <i class="fa fa-search"></i>
+        <input type="text" v-model="query" placeholder="Phone number" />
+        <i class="fa fa-search" @click="search(query)"></i>
       </div>
       <div class="table-responsive">
         <table class="table table-striped">
           <thead>
             <tr>
               <th>TID</th>
-              <th>OID</th>
-              <th>Tr.Date-Time</th>
-              <th>Tr.Status</th>
-              <th>Res.Status</th>
+              <th>Tr.Date</th>
+              <th>Payment Mode</th>
+              <th>Service.Status</th>
               <th>Service Date</th>
               <th>Name</th>
               <th>Phone</th>
+              <th>Area</th>
               <th>PIN</th>
+              <th>Delivered By</th>
             </tr>
           </thead>
           <tbody>
-            
             <!-- <div v-if="error.length != 0" class="error">{{error}}</div> -->
-             <tr v-for="tr in filteredList" v-bind:key="tr.id">
-              <td>{{tr.paymentDetails.txnId || '123456'}}</td>
-              <td>{{tr.paymentDetails.txnRef || '12345'}}</td>
-              <td>{{tr.transactionDate || 'no date'}}</td>
-              <td :class="[ tr.color ? 'green' : 'red' ]">{{tr.paymentDetails.status || 'noStatus'}}</td>
-              <td>{{tr.responseStatus || 'noRes'}}</td>
+            <tr v-for="tr in transactions" v-bind:key="tr.id">
+              <td>{{tr.id || '123456'}}</td>
+              <td>{{tr.transactionDate.toDate() || 'no date'}}</td>
+              <td>{{tr.paymentMode || 'No Mode'}}</td>
+              <td
+                :class="[ tr.responseStatus == 'delivered' ? 'green' : 'red' ]"
+              >{{tr.responseStatus || 'noRes'}}</td>
               <td>{{tr.serviceDateandTime||'nodate'}}</td>
               <td>{{tr.serviceAddress.name || 'noname'}}</td>
               <td>{{tr.serviceAddress.phone || '1234567890'}}</td>
+              <td>{{tr.serviceAddress.areaAndStreet || 'area'}}</td>
               <td>{{tr.serviceAddress.pincode||'123456'}}</td>
+              <td
+                v-if="tr.responseStatus == 'delivered' || tr.responseStatus == 'accepted'"
+              >{{tr.delivery.name+' '+ tr.delivery.phone}}</td>
+              <td v-if="tr.responseStatus == 'rejected'">{{tr.delivery.msg}}</td>
             </tr>
           </tbody>
-        </table>  
+        </table>
       </div>
     </div>
-    <!-- <pre>{{transactions}}</pre> -->
+    <div class="loader" v-if="loading">
+      <i class="fa fa-spinner fa-spin fa-5x"></i>
+    </div>
   </main>
 </template>
 
 <script>
-// import db from "../firebaseinit";
-import {mapState,mapActions} from 'vuex';
+import { mapState, mapActions } from "vuex";
 export default {
   data() {
     return {
-      datas: [],
-      query: '',
-      color: 0,
-      error: ''
+      query: "",
+      error: ""
     };
   },
-  mounted(){
+  mounted() {
     this.init();
   },
-  created() {
-
-
-  },
+  created() {},
   computed: {
-    ...mapState('trans',['transactions']),
-       filteredList(){
-      
-      return this.transactions.filter((tr) =>{
-        return tr.serviceAddress.name.toLowerCase().match(this.query.toLowerCase());
-       //console.log(user.name);
-      } )
+    ...mapState("trans", ["transactions", "loading"]),
+    filteredList() {
+      return this.transactions.filter(tr => {
+        return (
+          tr.serviceAddress.name
+            .toLowerCase()
+            .match(this.query.toLowerCase()) ||
+          tr.serviceAddress.phone.match(this.query)
+        );
+        //console.log(user.name);
+      });
     }
-    },
-    // ...mapGetters(['loadUserData']),
-  methods: mapActions('trans',['init']),
- 
-
-  
-}
+  },
+  // ...mapGetters(['loadUserData']),
+  methods: mapActions("trans", ["init", "search"])
+};
 </script>
 
 <style lang="css" scoped>
-
 table th,
 td {
   text-align: center;
 }
-.red{
+.red {
   color: red;
   font-weight: bold;
 }
-.green{
+.green {
   color: green;
-   font-weight: bold;
+  font-weight: bold;
 }
 /* Start search */
 .search {
@@ -121,9 +123,12 @@ td {
   color: #2b2f3a;
   font-size: 19px;
 }
-@media (min-width: 1200px){
+.search .fa-search {
+  cursor: pointer;
+}
+@media (min-width: 1200px) {
   .container {
     width: 100%;
-}
+  }
 }
 </style>

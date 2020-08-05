@@ -21,7 +21,9 @@
             <tr v-for="user in feedbacks" v-bind:key="user.id">
               <td>{{user.name}}</td>
               <td>{{user.phone}}</td>
-              <td><article>{{user.message}}</article></td>
+              <td>
+                <article>{{user.message}}</article>
+              </td>
               <td>
                 <a @click="like()">
                   <i class="fa fa-thumbs-up"></i>
@@ -32,43 +34,42 @@
               </td>
             </tr>
           </tbody>
-        </table>  
+        </table>
       </div>
-      
-        <!-- <pre>{{feedbacks}}</pre>   -->
+
+      <!-- <pre>{{feedbacks}}</pre>   -->
     </div>
   </main>
 </template>
 
 <script>
 //import db from "../firebaseinit.js";
-import {mapState, mapActions} from 'vuex';
+import { mapState, mapActions } from "vuex";
 export default {
   data() {
     return {
-      query: '',
-      error: ''
+      query: "",
+      error: ""
     };
   },
- mounted() {
-      this.init(); 
-
+  mounted() {
+    this.init();
   },
-computed: mapState('feeds',['feedbacks']),
-    // ...mapGetters(['loadUserData']),
+  computed: { ...mapState("feeds", ["feedbacks"]) },
+  // ...mapGetters(['loadUserData']),
   methods: {
-    ...mapActions('feeds',['init']),
-    dislike(){
-      alert('Removed User...');
+    ...mapActions("feeds", ["init"]),
+    dislike() {
+      alert("Removed User...");
     },
-    like(){
-      alert('Love User...');
+    like() {
+      alert("Love User...");
     }
-    },
-      
-      // return this.datas.filter((num) =>{
-      //      return (num.name.toLowerCase().match(this.query.toLowerCase()));
-    //})
+  }
+
+  // return this.datas.filter((num) =>{
+  //      return (num.name.toLowerCase().match(this.query.toLowerCase()));
+  //})
 
   // methods:{
   //   dislike(){
@@ -82,12 +83,11 @@ computed: mapState('feeds',['feedbacks']),
 </script>
 
 <style lang="css" scoped>
-
 td {
   text-align: left;
 }
-td a{
-    padding: 0.5em;
+td a {
+  padding: 0.5em;
 }
 /* Start search */
 .search {
@@ -114,9 +114,9 @@ td a{
   color: #2b2f3a;
   font-size: 19px;
 }
-@media (min-width: 1200px){
+@media (min-width: 1200px) {
   .container {
     width: 80%;
-}
+  }
 }
 </style>

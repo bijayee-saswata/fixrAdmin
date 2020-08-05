@@ -3,7 +3,7 @@
     <h2>Order Lists</h2>
     <div class="container-fluid">
       <div class="search">
-        <input type="text" v-model="query" placeholder="Type here" />
+        <input type="text" v-model="query" placeholder="Name or Phone number" />
         <i class="fa fa-search"></i>
       </div>
       <div class="table-responsive">
@@ -23,21 +23,33 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="data in filteredList" v-bind:key="data.txnRef">
-              <td>{{data.paymentDetails.txnRef || '1234'}}</td>
+            <tr v-for="data in filteredList" v-bind:key="data.id">
+              <td>{{data.id || '1234'}}</td>
               <td>{{data.serviceAddress.name}}</td>
               <td>{{data.serviceAddress.phone}}</td>
               <td>{{data.serviceAddress.altPhone}}</td>
               <td>{{data.serviceDetails.name}}</td>
               <td>{{data.serviceDetails.price || "noprice"}}</td>
-              <td><address>{{data.serviceAddress.locality}}</address></td>
+              <td>
+                <address>{{data.serviceAddress.locality}}</address>
+              </td>
               <td>{{data.serviceDateandTime}}</td>
 
               <td>
-                <span style="color: green;" data-toggle="modal" data-target="#acceptModal" v-on:click="update(data.paymentDetails.txnRef)">
+                <span
+                  style="color: green;"
+                  data-toggle="modal"
+                  data-target="#acceptModal"
+                  v-on:click="update(data.id)"
+                >
                   <i class="fa fa-check"></i>
                 </span>
-                <span style="color: red;" data-toggle="modal" data-target="#rejectModal" v-on:click="update(data.paymentDetails.txnRef)">
+                <span
+                  style="color: red;"
+                  data-toggle="modal"
+                  data-target="#rejectModal"
+                  v-on:click="update(data.id)"
+                >
                   <i class="fa fa-times"></i>
                 </span>
               </td>
@@ -56,8 +68,10 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="acceptModalLabel"><b>Accept Order</b></h5>
-              <input type="text" v-model="oId" disabled>
+              <h5 class="modal-title" id="acceptModalLabel">
+                <b>Accept Order</b>
+              </h5>
+              <input type="text" v-model="oId" disabled />
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -65,12 +79,12 @@
             <div class="modal-body">
               <span v-if="sent">Order Accepted</span>
               <form class="form-horizontal" v-else>
-                <p v-if="errors.length">
+                <div v-if="errors.length">
                   <b>Please correct the following error(s):</b>
                   <ul>
                     <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
                   </ul>
-                </p>
+                </div>
                 <div class="form-group">
                   <label class="control-label col-sm-2" for="cName">*Name:</label>
                   <div class="col-sm-10">
@@ -88,7 +102,7 @@
                   <label class="control-label col-sm-2" for="cPhone">*Phone:</label>
                   <div class="col-sm-10">
                     <input
-                      type="text"
+                      type="number"
                       class="form-control"
                       id="cPhone"
                       placeholder="Enter Mobile"
@@ -132,8 +146,10 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="rejectModalLabel"><b>Reject Order</b></h5>
-              <input type="text" v-model="oId" disabled>
+              <h5 class="modal-title" id="rejectModalLabel">
+                <b>Reject Order</b>
+              </h5>
+              <input type="text" v-model="oId" disabled />
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -141,12 +157,12 @@
             <div class="modal-body">
               <span v-if="sent">Order Rejected</span>
               <form class="form-horizontal" v-else>
-                 <p v-if="rErrors.length">
+                <div v-if="rErrors.length">
                   <b>Please correct the following error(s):</b>
                   <ul>
                     <li v-for="error in rErrors" v-bind:key="error">{{ error }}</li>
                   </ul>
-                </p>
+                </div>
                 <div class="form-group">
                   <label class="control-label col-sm-2" for="reason">*Reason:</label>
                   <div class="col-sm-10">
@@ -176,116 +192,115 @@
 
 <script>
 import db from "../firebaseinit.js";
-import {mapState, mapActions} from 'vuex';
+import { mapState, mapActions } from "vuex";
 export default {
   data() {
     return {
-      datas: [],
       oId: 1,
       query: "",
       sent: false,
       errors: [],
-      rErrors:[],
+      rErrors: [],
       rMsg: null,
       cName: null,
       cPhone: null,
-      caPhone: null
+      caPhone: null,
+      msg: ""
     };
   },
   mounted() {
-
     this.init();
   },
-   computed: {
-     ...mapState('orders',['orders']),
-    filteredList(){
-      return this.orders.filter((obj) =>{
-           return (obj.serviceAddress.name.toLowerCase().match(this.query.toLowerCase()));
-    })
+  computed: {
+    ...mapState("orders", ["orders"]),
+    filteredList() {
+      return this.orders.filter(tr => {
+        return (
+          tr.serviceAddress.name
+            .toLowerCase()
+            .match(this.query.toLowerCase()) ||
+          tr.serviceAddress.phone.match(this.query)
+        );
+      });
     }
-   },
-  methods:{ 
-    ...mapActions('orders',['init']),
-    update(id){
-      this.cName = '';
-      this.cPhone = '';
-      this.caPhone = '';
-      this.rMsg = '';
+  },
+  methods: {
+    ...mapActions("orders", ["init"]),
+    update(id) {
+      this.cName = "";
+      this.cPhone = null;
+      this.caPhone = "";
+      this.rMsg = "";
       this.sent = false;
       this.oId = id;
     },
     accept(e) {
       if (this.cName && this.cPhone && this.oId) {
         // return true;
-              let del = {
-                delivery:{
-        name: this.cName,
-        phone: this.cPhone,
-        alPhone: this.caPhone
-                }
-      }
-      let ref = db.collection("transactions").doc(this.oId);
-      ref.set(del,{merge: true}).then(() =>{
-        db.collection("transactions").doc(this.oId)
-        .set({responseStatus: "Accepted"},{merge: true}).then(()=>{
-
-          this.sent = true;
-        }).catch(err =>{
-          this.errors.push('Error occured.'+ err);
-        }); 
-      }).catch(err => {
-        this.errors.push('Something went wrong.' + err);
-      });
-      //console.log(d);
-     
+        let del = {
+          delivery: {
+            name: this.cName,
+            phone: this.cPhone,
+            alPhone: this.caPhone
+          },
+          responseStatus: "processing"
+        };
+        let ref = db.collection("Orders").doc(this.oId);
+        ref
+          .set(del, { merge: true })
+          .then(() => {
+            this.sent = true;
+          })
+          .catch(err => {
+            this.errors.push("Something went wrong." + err);
+          });
       }
 
       this.errors = [];
 
       if (!this.cName) {
-        this.errors.push('Name required.');
+        this.errors.push("Name required.");
       }
-      if(!this.cPhone){
-        this.errors.push('Number required.');
+      if (!this.cPhone) {
+        this.errors.push("Number required.");
       }
       if (!this.oId) {
-        this.rErrors.push('order id not found.');
+        this.rErrors.push("order id not found.");
       }
+
       e.preventDefault();
     },
     reject(e) {
       if (this.rMsg && this.oId) {
-                let del = {
-                delivery:{
-                  msg: this.rMsg
-                }
-      }
-      let ref = db.collection("transactions").doc(this.oId);
-      ref.set(del,{merge: true}).then(() =>{
-        db.collection("transactions").doc(this.oId)
-        .set({responseStatus: "Rejected"},{merge: true}).then(()=>{
-          this.sent = true;
-        })
-        .catch(err =>{
-          this.errors.push('Error occured.' + err);
-        }); 
-      }).catch(err => {
-        this.errors.push('Something went wrong. ' + err);
-      });
+        let del = {
+          delivery: {
+            msg: this.rMsg
+          },
+          responseStatus: "rejected"
+        };
+        let ref = db.collection("Orders").doc(this.oId);
+        ref
+          .set(del, { merge: true })
+          .then(() => {
+            this.sent = true;
+          })
+          .catch(err => {
+            this.errors.push("Something went wrong. " + err);
+          });
       }
 
       this.rErrors = [];
 
       if (!this.rMsg) {
-        this.rErrors.push('message required.');
+        this.rErrors.push("message required.");
       }
       if (!this.oId) {
-        this.rErrors.push('order id not found.');
+        this.rErrors.push("order id not found.");
       }
       e.preventDefault();
     }
   }
-  }
+};
 </script>
 
 <style lang="css" scoped>

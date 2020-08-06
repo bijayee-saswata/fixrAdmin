@@ -1,54 +1,48 @@
 // These can be imported from other files
 const admin = () => import("./components/admin.vue");
 const dashboard = () => import("./components/dashboard");
-const users = ()=> import('./components/users');
-const orders = ()=> import('./components/orders');
+const users = () => import("./components/users");
+const orders = () => import("./components/orders");
 const PageNotFound = () => import("./components/fallBack");
 const transactions = () => import("./components/transactions");
 const feedbacks = () => import("./components/feedback");
-const NavAdmin =() => import ("./components/NavAdmin");
-const callbacks = () => import("./components/callBack");
+const NavAdmin = () => import("./components/NavAdmin");
 
 export default [
   {
     path: "/admin",
     alias: "/",
     component: admin,
-    meta: { requiresGuest: true, showProgressBar: true }
+    meta: { requiresGuest: true, showProgressBar: true },
   },
   {
     path: "/admin/v",
     component: NavAdmin,
     meta: { requiresAuth: true, showProgressBar: true },
-    children : [
-
+    children: [
       {
         path: "dashboard",
         component: dashboard,
-        meta: { requiresGuest: true, showProgressBar: true }
+        meta: { requiresGuest: true, showProgressBar: true },
       },
       {
         path: "transactions",
-        component: transactions
+        component: transactions,
       },
       {
         path: "users",
-        component: users
+        component: users,
       },
       {
         path: "orders",
-        component: orders
+        component: orders,
       },
       {
         path: "feedbacks",
-        component: feedbacks
+        component: feedbacks,
       },
-      {
-        path: "callbacks",
-        component: callbacks
-      },
-    ]
+    ],
   },
-  
-  { path: "*", component: PageNotFound }
+
+  { path: "*", component: PageNotFound },
 ];

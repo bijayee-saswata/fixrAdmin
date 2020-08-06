@@ -25,9 +25,9 @@
           </thead>
           <tbody>
             <!-- <div v-if="error.length != 0" class="error">{{error}}</div> -->
-            <tr v-for="tr in transactions" v-bind:key="tr.id">
+            <tr v-for="tr in filteredList" v-bind:key="tr.id">
               <td>{{tr.id || '123456'}}</td>
-              <td>{{tr.transactionDate.toDate() || 'no date'}}</td>
+              <td>{{tr.transactionDate.toDate()|| 'no date'}}</td>
               <td>{{tr.paymentMode || 'No Mode'}}</td>
               <td
                 :class="[ tr.responseStatus == 'delivered' ? 'green' : 'red' ]"
@@ -58,7 +58,7 @@ export default {
   data() {
     return {
       query: "",
-      error: ""
+      error: "",
     };
   },
   mounted() {
@@ -68,7 +68,7 @@ export default {
   computed: {
     ...mapState("trans", ["transactions", "loading"]),
     filteredList() {
-      return this.transactions.filter(tr => {
+      return this.transactions.filter((tr) => {
         return (
           tr.serviceAddress.name
             .toLowerCase()
@@ -77,10 +77,11 @@ export default {
         );
         //console.log(user.name);
       });
-    }
+    },
   },
-  // ...mapGetters(['loadUserData']),
-  methods: mapActions("trans", ["init", "search"])
+  methods: {
+    ...mapActions("trans", ["init", "search"]),
+  },
 };
 </script>
 

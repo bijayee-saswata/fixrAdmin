@@ -1,20 +1,39 @@
-import { firestoreAction } from 'vuexfire';
+import { firestoreAction } from "vuexfire";
 import db from "../firebaseinit";
 
 const state = {
-    users: [],
-}
-const getters = {
-
-}
+  users: [],
+  loading: true,
+};
 const actions = {
-    init: firestoreAction(({bindFirestoreRef})=>{
-        bindFirestoreRef('users', db.collection('users'))
-    })
-}
+  init: firestoreAction(({ bindFirestoreRef }) => {
+    bindFirestoreRef("users", db.collection("users").limit(20)).then(() => {
+      state.loading = false;
+    });
+  }),
+  search: firestoreAction(({ state, bindFirestoreRef }, query) => {
+    state.loading = true;
 
-export default{
-    namespaced : true,
-    state,
-    actions
-}
+    if (query) {
+      query = query.trim();
+      bindFirestoreRef(
+        "users",
+        db
+          .collection("users")
+          .where("phone", "==", query.includes("+91") ? query : `+91${query}`)
+      ).then(() => {
+        state.loading = false;
+      });
+    } else {
+      bindFirestoreRef("users", db.collection("users").limit(20)).then(() => {
+        state.loading = false;
+      });
+    }
+  }),
+};
+
+export default {
+  namespaced: true,
+  state,
+  actions,
+};

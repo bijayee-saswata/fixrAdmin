@@ -41,10 +41,6 @@
             <i class="fa fa-bolt"></i>
             <router-link to="/admin/v/transactions">Transactions</router-link>
           </li>
-          <li>
-            <i class="fa fa-phone"></i>
-            <router-link to="/admin/v/callbacks">Callbacks</router-link>
-          </li>
 
           <li>
             <i class="fa fa-envelope"></i>

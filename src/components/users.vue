@@ -2,10 +2,10 @@
   <main>
     <h2>Users List</h2>
 
-    <div class="container">
+    <div class="container" v-if="!loading">
       <div class="search">
-        <input type="text" v-model="query" placeholder="Type here" />
-        <i class="fa fa-search"></i>
+        <input type="text" v-model="query" placeholder="phone number" />
+        <i class="fa fa-search" @click="search(query)"></i>
       </div>
       <div class="table-responsive">
         <table class="table table-striped">
@@ -13,8 +13,8 @@
             <tr>
               <th>UID</th>
               <th>Name</th>
-              <th>Email</th>
               <th>Phone</th>
+              <th>Alt Phone</th>
               <th>Adds</th>
               <th>Locality</th>
               <th>PIN</th>
@@ -22,11 +22,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="user in filteredList" v-bind:key="user.id">
+            <tr v-for="user in users" v-bind:key="user.id">
               <td>{{user.id || 1234}}</td>
               <td>{{user.name || "unknown"}}</td>
-              <td>{{user.email || "no@email.com"}}</td>
               <td>{{user.phone || 1234567890}}</td>
+              <td>{{user.altPhone}}</td>
               <td>
                 <address>{{user.areaAndStreet || 'no address'}}</address>
               </td>
@@ -42,7 +42,9 @@
         </table>
       </div>
     </div>
-    <!-- <pre>{{users}}</pre> -->
+    <div class="loader" v-if="loading">
+      <i class="fa fa-spinner fa-spin fa-5x"></i>
+    </div>
   </main>
 </template>
 
@@ -51,7 +53,6 @@ import { mapState, mapActions } from "vuex";
 export default {
   data() {
     return {
-      datas: [],
       query: "",
       error: ""
     };
@@ -60,7 +61,7 @@ export default {
     this.init();
   },
   computed: {
-    ...mapState("users", ["users"]),
+    ...mapState("users", ["users", "loading"]),
     filteredList() {
       return this.users.filter(obj => {
         return obj.name
@@ -70,7 +71,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions("users", ["init"])
+    ...mapActions("users", ["init", "search"])
   }
 };
 </script>

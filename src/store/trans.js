@@ -5,6 +5,7 @@ const state = {
   transactions: [],
   loading: true,
 };
+
 const actions = {
   init: firestoreAction(({ state, bindFirestoreRef }) => {
     bindFirestoreRef(
@@ -12,7 +13,7 @@ const actions = {
       db
         .collection("Orders")
         .orderBy("transactionDate", "desc")
-        .limit(10)
+        .limit(20)
     ).then(() => {
       state.loading = false;
     });
@@ -20,12 +21,17 @@ const actions = {
   search: firestoreAction(({ state, bindFirestoreRef }, query) => {
     state.loading = true;
     if (query) {
+      query = query.trim();
       bindFirestoreRef(
         "transactions",
         db
           .collection("Orders")
           .orderBy("transactionDate", "desc")
-          .where("serviceAddress.phone", "==", query)
+          .where(
+            "serviceAddress.phone",
+            "==",
+            query.includes("+91") ? query : `+91${query}`
+          )
       ).then(() => {
         state.loading = false;
       });
@@ -35,7 +41,7 @@ const actions = {
         db
           .collection("Orders")
           .orderBy("transactionDate", "desc")
-          .limit(10)
+          .limit(20)
       ).then(() => {
         state.loading = false;
       });

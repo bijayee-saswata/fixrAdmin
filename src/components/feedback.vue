@@ -13,31 +13,28 @@
             <tr>
               <th>Name</th>
               <th>Phone No.</th>
+              <th>Type</th>
+              <th>Created Date</th>
               <th>Message</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="user in feedbacks" v-bind:key="user.id">
+            <tr v-for="user in filteredList" v-bind:key="user.id">
               <td>{{user.name}}</td>
               <td>{{user.phone}}</td>
+              <td>{{user.msgType}}</td>
+              <td>{{user.createdDate.toDate()}}</td>
               <td>
                 <article>{{user.message}}</article>
               </td>
-              <td>
-                <a @click="like()">
-                  <i class="fa fa-thumbs-up"></i>
-                </a>
-                <a @click="dislike()">
-                  <i class="fa fa-thumbs-down"></i>
-                </a>
+              <td v-if="!locked">
+                <i class="fa fa-edit" @click="resolved(user.id)"></i>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-
-      <!-- <pre>{{feedbacks}}</pre>   -->
     </div>
   </main>
 </template>
@@ -49,36 +46,28 @@ export default {
   data() {
     return {
       query: "",
-      error: ""
+      error: "",
     };
   },
   mounted() {
     this.init();
   },
-  computed: { ...mapState("feeds", ["feedbacks"]) },
+  computed: {
+    ...mapState("feeds", ["feedbacks", "locked"]),
+    filteredList() {
+      return this.feedbacks.filter((feed) => {
+        return (
+          feed.name.toLowerCase().match(this.query.toLowerCase()) ||
+          feed.phone.match(this.query)
+        );
+        //console.log(user.name);
+      });
+    },
+  },
   // ...mapGetters(['loadUserData']),
   methods: {
-    ...mapActions("feeds", ["init"]),
-    dislike() {
-      alert("Removed User...");
-    },
-    like() {
-      alert("Love User...");
-    }
-  }
-
-  // return this.datas.filter((num) =>{
-  //      return (num.name.toLowerCase().match(this.query.toLowerCase()));
-  //})
-
-  // methods:{
-  //   dislike(){
-  //     alert('Removed User...');
-  //   },
-  //   like(){
-  //     alert('Love User...');
-  //   }
-  // }
+    ...mapActions("feeds", ["init", "resolved"]),
+  },
 };
 </script>
 

@@ -30,6 +30,19 @@ const actions = {
       });
     }
   }),
+  removeUser: firestoreAction(({ state }, id) => {
+    const res = confirm(
+      `Are you sure to delete the user ${id} ? Once done can't be retrieve back..!`
+    );
+    if (res) {
+      db.collection("users")
+        .doc(id)
+        .delete()
+        .then(() => {
+          state.loading = false;
+        });
+    }
+  }),
 };
 
 export default {

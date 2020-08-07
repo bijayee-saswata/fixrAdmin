@@ -54,7 +54,7 @@ export default {
   data() {
     return {
       query: "",
-      error: ""
+      error: "",
     };
   },
   mounted() {
@@ -63,16 +63,16 @@ export default {
   computed: {
     ...mapState("users", ["users", "loading"]),
     filteredList() {
-      return this.users.filter(obj => {
+      return this.users.filter((obj) => {
         return obj.name
           ? obj.name.toLowerCase().match(this.query.toLowerCase())
           : obj.phone.match(this.query);
       });
-    }
+    },
   },
   methods: {
-    ...mapActions("users", ["init", "search"])
-  }
+    ...mapActions("users", ["init", "search", "removeUser"]),
+  },
 };
 </script>
 
@@ -109,6 +109,9 @@ td span {
   display: block;
   color: #2b2f3a;
   font-size: 19px;
+}
+.search .fa-search {
+  cursor : pointer;
 }
 @media (min-width: 1200px) {
   .container {

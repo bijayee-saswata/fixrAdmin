@@ -2,9 +2,9 @@
   <main>
     <h2>Feedback List</h2>
 
-    <div class="container">
+    <div class="container" v-if="!loading">
       <div class="search">
-        <input type="text" v-model="query" placeholder="Type here" />
+        <input type="text" v-model="query" placeholder="Name or Phone Number" />
         <i class="fa fa-search"></i>
       </div>
       <div class="table-responsive">
@@ -36,38 +36,36 @@
         </table>
       </div>
     </div>
+    <i class="fa fa-spinner fa-spin fa-5x" v-if="loading"></i>
   </main>
 </template>
 
 <script>
-//import db from "../firebaseinit.js";
 import { mapState, mapActions } from "vuex";
 export default {
   data() {
     return {
       query: "",
-      error: "",
+      error: ""
     };
   },
-  mounted() {
-    this.init();
-  },
   computed: {
-    ...mapState("feeds", ["feedbacks", "locked"]),
+    ...mapState("feeds", ["feedbacks", "locked", "loading"]),
     filteredList() {
-      return this.feedbacks.filter((feed) => {
+      return this.feedbacks.filter(feed => {
         return (
           feed.name.toLowerCase().match(this.query.toLowerCase()) ||
           feed.phone.match(this.query)
         );
-        //console.log(user.name);
       });
-    },
+    }
   },
-  // ...mapGetters(['loadUserData']),
   methods: {
-    ...mapActions("feeds", ["init", "resolved"]),
+    ...mapActions("feeds", ["init", "resolved"])
   },
+  mounted() {
+    this.init();
+  }
 };
 </script>
 
@@ -102,6 +100,10 @@ td a {
   display: block;
   color: #2b2f3a;
   font-size: 19px;
+}
+tbody .fa-edit {
+  cursor: pointer;
+  color: green;
 }
 @media (min-width: 1200px) {
   .container {

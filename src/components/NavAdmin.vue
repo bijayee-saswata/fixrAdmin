@@ -42,18 +42,18 @@
             <router-link to="/admin/v/transactions">Transactions</router-link>
           </li>
 
-          <li>
+          <li v-if="feedbacks">
             <i class="fa fa-envelope"></i>
             <router-link to="/admin/v/feedbacks">
               Feedbacks
-              <span class="num dang">{{comments}}</span>
+              <span class="num dang">{{feedbacks.length}}</span>
             </router-link>
           </li>
           <li>
             <i class="fa fa-envelope-open-o"></i>
             <router-link to="/admin/v/orders">
               Orders
-              <span class="num dang">{{notification}}</span>
+              <span class="num dang">{{orders.length}}</span>
             </router-link>
           </li>
           <li>
@@ -138,15 +138,25 @@
                 </ul>
               </li>
               <li>
-                <router-link to="/admin/v/feedbacks">
+                <router-link
+                  to="/admin/v/feedbacks"
+                  data-toggle="tooltip"
+                  data-placement="bottom"
+                  title="FeedBacks"
+                >
                   <i class="fa fa-comments"></i>
-                  <span>{{comments}}</span>
+                  <span>{{feedbacks.length}}</span>
                 </router-link>
               </li>
               <li>
-                <router-link to="/admin/v/orders">
+                <router-link
+                  to="/admin/v/orders"
+                  data-toggle="tooltip"
+                  data-placement="bottom"
+                  title="Pending Orders"
+                >
                   <i class="fa fa-bell"></i>
-                  <span>{{notification}}</span>
+                  <span>{{orders.length}}</span>
                 </router-link>
               </li>
               <li>
@@ -166,19 +176,24 @@
 
 <script>
 import firebase from "firebase";
+import { mapState, mapActions } from "vuex";
 export default {
   data() {
     return {
       name: "Hello",
       email: "example@email.com",
       isLoggedIn: false,
-      notification: 0,
-      comments: 0,
       curUser: false,
       feedbackDatas: []
     };
   },
   methods: {
+    ...mapActions("feeds", {
+      getFeeds: "init"
+    }),
+    ...mapActions("trans", {
+      getOrders: "init"
+    }),
     logout() {
       firebase
         .auth()
@@ -189,9 +204,15 @@ export default {
         });
     }
   },
+  computed: {
+    ...mapState("feeds", ["feedbacks"]),
+    ...mapState("orders", ["orders"])
+  },
   created() {
     const user = firebase.auth().currentUser;
     this.email = user.email;
+    this.getOrders();
+    this.getFeeds();
   },
   mounted() {
     //menu

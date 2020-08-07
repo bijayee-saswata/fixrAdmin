@@ -1,7 +1,7 @@
 <template>
   <main>
     <h2>Order Lists</h2>
-    <div class="container-fluid">
+    <div class="container-fluid" v-if="!loading">
       <div class="search">
         <input type="text" v-model="query" placeholder="Name or Phone number" />
         <i class="fa fa-search"></i>
@@ -186,7 +186,7 @@
         </div>
       </div>
     </div>
-    <!-- <pre>{{orders}}</pre> -->
+    <i class="fa fa-spinner fa-spin fa-5x" v-if="loading"></i>
   </main>
 </template>
 
@@ -212,7 +212,7 @@ export default {
     this.init();
   },
   computed: {
-    ...mapState("orders", ["orders"]),
+    ...mapState("orders", ["orders", "loading"]),
     filteredList() {
       return this.orders.filter(tr => {
         return (
